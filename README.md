@@ -11,4 +11,4 @@ Every day at 07:00 (Asia/Bangkok, 00:00 UTC) the agent searches the web and comm
 
 ## Latest digests
 
-_(updated automatically by the daily agent)_
+- [2026-07-11](news/2026-07-11.md)
