@@ -8,3 +8,7 @@ Every day at 07:00 (Asia/Bangkok, 00:00 UTC) the agent searches the web and comm
 - AI & tech trends
 - World & international news
 - Thailand news
+
+## Latest digests
+
+- [2026-07-11](news/2026-07-11.md)
