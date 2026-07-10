@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daily News Digest</title>
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Daily News Digest</h1>
+    <div class="nav-controls">
+      <button id="prevBtn" title="Previous day">&larr;</button>
+      <select id="dateSelect"></select>
+      <button id="nextBtn" title="Next day">&rarr;</button>
+    </div>
+  </header>
+
+  <nav id="topicBar" class="topic-bar"></nav>
+
+  <main id="content" class="content">
+    <p class="status">Loading digests&hellip;</p>
+  </main>
+
+  <script src="assets/app.js" defer></script>
+</body>
+</html>
