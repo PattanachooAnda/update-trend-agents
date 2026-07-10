@@ -2,14 +2,13 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Repository Status
+## What this repo is
 
-Greenfield repository — no code yet (as of 2026-07-11). The intended purpose is to build agents that fetch trending news and update it on a daily schedule.
+A daily news digest, written automatically by a scheduled Claude Code cloud routine — there is no application code to build or test.
 
-Once the initial implementation lands, update this file with:
-- Build / run / test commands
-- Architecture overview (how the agents are structured, where fetched news is stored, how scheduling works)
+- **Routine:** "Daily News Digest" (ID `trig_018qyPgVy9Roy4BCrbDY8QpY`), runs daily at 00:00 UTC (07:00 Asia/Bangkok). Manage it at https://claude.ai/code/routines
+- **What each run does:** web-searches the day's news (Crypto & Markets, AI & Tech, World, Thailand), writes `news/YYYY-MM-DD.md` (Bangkok date), refreshes the "Latest digests" list in `README.md`, and commits directly to `main`.
 
-## Notes
+## Working locally
 
-- The local default branch is `master`, but PRs should target `main`.
+The cloud agent pushes to `main` every day — always `git pull` before committing from this machine. Changes to the digest format or topics should be made by updating the routine's prompt (via `/schedule` or claude.ai/code/routines), not by editing generated files in `news/`.
