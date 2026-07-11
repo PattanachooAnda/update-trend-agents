@@ -102,6 +102,51 @@ body {
   background: var(--accent-bg);
 }
 
+.time-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.time-bar:empty {
+  display: none;
+  border-bottom: none;
+  padding: 0;
+}
+
+.time-bar-label {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 4px;
+}
+
+.time-chip {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.time-chip:hover {
+  background: var(--accent-bg);
+  color: var(--text);
+}
+
+.time-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
 .topic-chip.active {
   background: var(--accent);
   border-color: var(--accent);

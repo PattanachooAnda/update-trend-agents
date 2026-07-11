@@ -1,20 +1,26 @@
 (() => {
   const PROBE_DAYS = 120; // how many calendar days back to look for digest files
+  const SNAPSHOT_HOURS = ["00", "05", "10", "15", "20"]; // intraday run times (Bangkok)
 
   const dateSelect = document.getElementById("dateSelect");
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
   const refreshBtn = document.getElementById("refreshBtn");
   const topicBar = document.getElementById("topicBar");
+  const timeBar = document.getElementById("timeBar");
   const content = document.getElementById("content");
 
   /** @type {string[]} descending, e.g. ["2026-07-11", "2026-07-10"] */
   let availableDates = [];
-  /** date -> { sections: Map<string, string[]> } (values are raw bullet lines) */
+  /** date -> { sections: Map<string, string[]> } (values are raw bullet lines) — the final/latest digest for that date */
   const parsedByDate = new Map();
+  /** date -> Map<hour, { sections }> — intraday snapshots, only present for dates that have them */
+  const snapshotsByDate = new Map();
   let currentIndex = 0;
   let currentTopic = "All";
   let aggregateMode = false;
+  /** @type {string|null} selected snapshot hour (e.g. "10"), or null to show the latest/daily content */
+  let currentHour = null;
 
   function toDateStr(d) {
     return d.toISOString().slice(0, 10);
@@ -49,6 +55,49 @@
       if (r) parsedByDate.set(r.dateStr, parseDigest(r.text));
     }
     availableDates = checks.filter((d) => parsedByDate.has(d));
+  }
+
+  /** For each known date, look for intraday snapshot files (news/DATE-HH.md). The
+   *  last hour in SNAPSHOT_HOURS is represented by the daily file itself (already
+   *  fetched in probeDates), not a separate file. */
+  async function probeSnapshots() {
+    snapshotsByDate.clear();
+    const earlierHours = SNAPSHOT_HOURS.slice(0, -1);
+    const lastHour = SNAPSHOT_HOURS[SNAPSHOT_HOURS.length - 1];
+
+    await Promise.all(
+      availableDates.map(async (dateStr) => {
+        const results = await Promise.all(
+          earlierHours.map(async (hh) => {
+            try {
+              const res = await fetch(`news/${dateStr}-${hh}.md`, { cache: "no-store" });
+              if (!res.ok) return null;
+              const text = await res.text();
+              return { hh, text };
+            } catch {
+              return null;
+            }
+          })
+        );
+
+        const hourMap = new Map();
+        for (const r of results) {
+          if (r) hourMap.set(r.hh, parseDigest(r.text));
+        }
+        if (hourMap.size > 0) {
+          hourMap.set(lastHour, parsedByDate.get(dateStr));
+          snapshotsByDate.set(dateStr, hourMap);
+        }
+      })
+    );
+  }
+
+  function activeSections(dateStr) {
+    const snapshots = snapshotsByDate.get(dateStr);
+    if (snapshots && currentHour && snapshots.has(currentHour)) {
+      return snapshots.get(currentHour).sections;
+    }
+    return parsedByDate.get(dateStr).sections;
   }
 
   function escapeHtml(str) {
@@ -112,6 +161,30 @@
     }
   }
 
+  function renderTimeBar(dateStr) {
+    timeBar.innerHTML = "";
+    const snapshots = snapshotsByDate.get(dateStr);
+    if (!snapshots) return;
+
+    const label = document.createElement("span");
+    label.className = "time-bar-label";
+    label.textContent = "Snapshot:";
+    timeBar.appendChild(label);
+
+    const activeHour = currentHour && snapshots.has(currentHour) ? currentHour : SNAPSHOT_HOURS[SNAPSHOT_HOURS.length - 1];
+    for (const hh of SNAPSHOT_HOURS) {
+      if (!snapshots.has(hh)) continue;
+      const chip = document.createElement("button");
+      chip.className = "time-chip" + (hh === activeHour ? " active" : "");
+      chip.textContent = `${hh}:00`;
+      chip.addEventListener("click", () => {
+        currentHour = hh;
+        render();
+      });
+      timeBar.appendChild(chip);
+    }
+  }
+
   function renderSection(topic, lines) {
     const section = document.createElement("section");
     section.className = "topic-section";
@@ -134,7 +207,9 @@
     const header = document.createElement("div");
     header.className = "day-header";
     const h2 = document.createElement("h2");
-    h2.textContent = dateStr;
+    const snapshots = snapshotsByDate.get(dateStr);
+    const activeHour = snapshots && currentHour && snapshots.has(currentHour) ? currentHour : null;
+    h2.textContent = activeHour ? `${dateStr} — ${activeHour}:00 snapshot` : dateStr;
     header.appendChild(h2);
     content.appendChild(header);
 
@@ -149,7 +224,7 @@
       content.appendChild(toggle);
     }
 
-    const { sections } = parsedByDate.get(dateStr);
+    const sections = activeSections(dateStr);
     const topicsToShow = currentTopic === "All" ? Array.from(sections.keys()) : [currentTopic];
 
     let rendered = 0;
@@ -232,9 +307,12 @@
     dateSelect.value = availableDates[currentIndex];
 
     if (aggregateMode && currentTopic !== "All") {
+      timeBar.innerHTML = "";
       renderAggregateView(currentTopic);
     } else {
-      renderDayView(availableDates[currentIndex]);
+      const dateStr = availableDates[currentIndex];
+      renderTimeBar(dateStr);
+      renderDayView(dateStr);
     }
   }
 
@@ -252,6 +330,7 @@
     if (currentIndex < availableDates.length - 1) {
       currentIndex++;
       aggregateMode = false;
+      currentHour = null;
       render();
     }
   });
@@ -260,6 +339,7 @@
     if (currentIndex > 0) {
       currentIndex--;
       aggregateMode = false;
+      currentHour = null;
       render();
     }
   });
@@ -269,6 +349,7 @@
     if (idx !== -1) {
       currentIndex = idx;
       aggregateMode = false;
+      currentHour = null;
       render();
     }
   });
@@ -284,6 +365,7 @@
     refreshBtn.textContent = "Refreshing…";
     try {
       await probeDates();
+      await probeSnapshots();
       populateDateSelect();
       const preservedIndex = preserveDate ? availableDates.indexOf(preserveDate) : -1;
       currentIndex = preservedIndex !== -1 ? preservedIndex : 0;

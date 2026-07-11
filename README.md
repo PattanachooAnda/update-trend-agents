@@ -2,12 +2,14 @@
 
 News digest, updated automatically by a scheduled Claude Code cloud agent.
 
-Every 5 hours — at 00:00, 05:00, 10:00, 15:00, and 20:00 (Asia/Bangkok) — the agent searches the web and commits a digest to `news/YYYY-MM-DD.md` covering:
+Every 5 hours — at 00:00, 05:00, 10:00, 15:00, and 20:00 (Asia/Bangkok) — the agent searches the web for recent news covering:
 
 - Crypto & markets
 - AI & tech trends
 - World & international news
 - Thailand news
+
+The 20:00 run writes the day's canonical digest to `news/YYYY-MM-DD.md`. The other four runs write intraday snapshots to `news/YYYY-MM-DD-HH.md` (e.g. `news/2026-07-12-05.md`), which the viewer below picks up automatically as a time selector on days that have them.
 
 ## Viewing the digests
 
