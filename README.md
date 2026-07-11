@@ -1,8 +1,8 @@
 # update-trend-agents
 
-Daily news digest, updated automatically by a scheduled Claude Code cloud agent.
+News digest, updated automatically by a scheduled Claude Code cloud agent.
 
-Every day at 22:00 (Asia/Bangkok, 15:00 UTC) the agent searches the web and commits a digest to `news/YYYY-MM-DD.md` covering:
+Every 5 hours — at 00:00, 05:00, 10:00, 15:00, and 20:00 (Asia/Bangkok) — the agent searches the web and commits a digest to `news/YYYY-MM-DD.md` covering:
 
 - Crypto & markets
 - AI & tech trends
