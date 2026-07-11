@@ -4,6 +4,7 @@
   const dateSelect = document.getElementById("dateSelect");
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
+  const refreshBtn = document.getElementById("refreshBtn");
   const topicBar = document.getElementById("topicBar");
   const content = document.getElementById("content");
 
@@ -20,9 +21,12 @@
   }
 
   async function probeDates() {
+    parsedByDate.clear();
     const today = new Date();
     const checks = [];
-    for (let i = 0; i < PROBE_DAYS; i++) {
+    // Start one day ahead of the browser's UTC "today": digest filenames use the
+    // Bangkok (UTC+7) calendar date, which can already be a day ahead of UTC.
+    for (let i = -1; i < PROBE_DAYS; i++) {
       const d = new Date(today);
       d.setUTCDate(d.getUTCDate() - i);
       checks.push(toDateStr(d));
@@ -269,10 +273,26 @@
     }
   });
 
-  (async function init() {
-    await probeDates();
-    populateDateSelect();
-    currentIndex = 0;
-    render();
-  })();
+  refreshBtn.addEventListener("click", () => {
+    const selectedDate = availableDates[currentIndex];
+    loadAndRender(selectedDate);
+  });
+
+  async function loadAndRender(preserveDate) {
+    refreshBtn.disabled = true;
+    const originalLabel = refreshBtn.textContent;
+    refreshBtn.textContent = "Refreshing…";
+    try {
+      await probeDates();
+      populateDateSelect();
+      const preservedIndex = preserveDate ? availableDates.indexOf(preserveDate) : -1;
+      currentIndex = preservedIndex !== -1 ? preservedIndex : 0;
+      render();
+    } finally {
+      refreshBtn.disabled = false;
+      refreshBtn.textContent = originalLabel;
+    }
+  }
+
+  loadAndRender();
 })();
