@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A daily news digest, written automatically by a scheduled Claude Code cloud routine — there is no application code to build or test.
 
-- **Routine:** "Daily News Digest" (ID `trig_018qyPgVy9Roy4BCrbDY8QpY`), runs daily at 00:00 UTC (07:00 Asia/Bangkok). Manage it at https://claude.ai/code/routines
+- **Routine:** "Daily News Digest" (ID `trig_018qyPgVy9Roy4BCrbDY8QpY`), runs daily at 15:00 UTC (22:00 Asia/Bangkok). Manage it at https://claude.ai/code/routines
 - **What each run does:** web-searches the day's news (Crypto & Markets, AI & Tech, World, Thailand), writes `news/YYYY-MM-DD.md` (Bangkok date), refreshes the "Latest digests" list in `README.md`, and commits directly to `main`.
 
 ## Working locally
