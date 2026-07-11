@@ -214,7 +214,7 @@
     const div = document.createElement("div");
     div.className = "empty-state";
     div.innerHTML =
-      "No digests found yet.<br/>The daily agent writes <code>news/YYYY-MM-DD.md</code> every morning at 07:00 (Asia/Bangkok).<br/>Check back after the next run.";
+      "No digests found yet.<br/>The agent writes <code>news/YYYY-MM-DD.md</code> every 5 hours (00:00, 05:00, 10:00, 15:00, 20:00 Asia/Bangkok).<br/>Check back after the next run.";
     content.appendChild(div);
     dateSelect.innerHTML = "";
     prevBtn.disabled = true;
