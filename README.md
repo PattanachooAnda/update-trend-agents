@@ -23,4 +23,5 @@ Then open http://localhost:8000/ in a browser.
 
 ## Latest digests
 
+- [2026-07-12](news/2026-07-12.md)
 - [2026-07-11](news/2026-07-11.md)
